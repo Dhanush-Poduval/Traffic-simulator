@@ -8,8 +8,9 @@ from datetime import datetime
 class Cars(Base):
     __tablename__='cars'
     id=Column(Integer,primary_key=True,index=True)
-    entry_time=Column(DateTime(timezone=True),default=lambda:datetime.now(ZoneInfo("Asia/Kolkata")))
-    location=Column(String)
+    car_amount=Column(Integer)
+    intersection_name=Column(String)
+
 
 class Intersection(Base):
     __tablename__='Intersection'

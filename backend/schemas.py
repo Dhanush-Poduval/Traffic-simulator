@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class Cars(BaseModel):
-    entry_time:datetime
-    location:str
+    car_amount:int
+    intersection_name:str
 class Intersection(BaseModel):
     car_amount:int
     signal:str
