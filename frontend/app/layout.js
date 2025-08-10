@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Themeprovider } from "@/components/Themeprovider";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,12 +20,23 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
+    <html lang="en" suppressHydrationWarning>
+     
+        <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+        >
+          <Themeprovider attribute="class" defaultTheme='system' enableSystem disableTransitionOnChange>
+            <div className="w-full">
+              <Navbar />
+             <div className="px-4 mt-10">{children}</div> 
+            </div>
+            
+          </Themeprovider>
+          
+        </body>
+        
+     
+      
     </html>
   );
 }

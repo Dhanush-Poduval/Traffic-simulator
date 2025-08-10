@@ -54,18 +54,7 @@ def get_all(db:Session=Depends(get_db)):
     return values
 
 
-@app.post('/car/details',response_model=schemas.Cars)
-def get_cars(db:Session=Depends(get_db)):
-    new_values=models.Cars(car_amount=round(random.uniform(0,10)),intersection_name=random.choice(intersections))
-    db.add(new_values)
-    db.commit()
-    db.refresh(new_values)
-    return new_values
 
-@app.get('/car/details',response_model=List[schemas.Cars])
-def show_cars(db:Session=Depends(get_db)):
-    values=db.query(models.Cars).all()
-    return values
 
 
 @app.post('/intersection/{intersection_name}',response_model=schemas.Intersection)
@@ -89,11 +78,20 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
     for neighbour_short , cars_toadd in zip(neightbour_list,[cars_first,cars_second]):
         neighbour_full_name=f'Signal {neighbour_short}'
         neighbor = db.query(models.Intersection).filter(models.Intersection.intersection_name == neighbour_full_name).first()
-        if neighbor:
-            neighbor.car_amount+=cars_toadd
+        if not neighbor:
+            neighbor = models.Intersection(car_amount=0, signal='Red', intersection_name=neighbour_full_name)
+            db.add(neighbor)
+            db.commit()
+            db.refresh(neighbor)
+        neighbor.car_amount += cars_toadd
+        db.commit()
+        db.refresh(neighbor)
+            
+    
     
     intersection.car_amount=0
     
+
     
 
 
