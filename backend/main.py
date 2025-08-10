@@ -41,7 +41,7 @@ def car_generator(db: Session = Depends(get_db)):
         db.refresh(intersection)
 
     # Add random cars to this intersection
-    cars_to_add = round(random.uniform(0, 50))
+    cars_to_add = random.randint(1,3)
     intersection.car_amount += cars_to_add
     db.commit()
     db.refresh(intersection)
@@ -52,6 +52,24 @@ def car_generator(db: Session = Depends(get_db)):
 def get_all(db:Session=Depends(get_db)):
     values=db.query(models.Intersection).all()
     return values
+@app.post('/signal/{intersection_name}/green')
+def green(intersection_name,db:Session=Depends(get_db)):
+    signals=db.query(models.Intersection).filter(models.Intersection.intersection_name==intersection_name).first()
+    if not signals:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Intersection not found")
+    signals.signal='Green'
+    db.commit()
+    db.refresh(signals)
+    return {"message":f"{intersection_name} signal turned Green"}
+@app.post('/signal/{intersection_name}/red')
+def red(intersection_name,db:Session=Depends(get_db)):
+    signals=db.query(models.Intersection).filter(models.Intersection.intersection_name==intersection_name).first()
+    if not signals:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Intersection not found")
+    signals.signal='Red'
+    db.commit()
+    db.refresh(signals)
+    return {"message":f"{intersection_name} signal turned Red"}
 
 
 
@@ -63,10 +81,12 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
     if not intersection:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="Invalid intersection")
     #like the car counting logic thing
+    if intersection.signal!='Green':
+        return intersection
 
     cars=intersection.car_amount
     #randomize car count from cars
-    random_cars=round(random.uniform(0,cars))
+    random_cars=round(random.uniform(1,cars))
 
     #to get the places where these cars can like go too
     short_name=intersection_name.split()[-1]
@@ -89,7 +109,7 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
             
     
     
-    intersection.car_amount=0
+    intersection.car_amount=1
     
 
     
