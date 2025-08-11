@@ -2,51 +2,77 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { useState, useEffect } from "react";
+import { useState, useEffect , useRef } from "react";
+import { Button } from "./ui/button";
+const cars=[60,60,80,30];
 
 export default function IntersectionA() {
-  const [chartData, setChartData] = useState([]);
-  const [carsCount, setCarsCount] = useState(0);
-  const [signalStatus, setSignalStatus] = useState("🟢");
+  
+  const [carAmount , setcarAmount]=useState()
+  const[signal , setSignal]=useState()
+  const intervalRef= useRef(null)
 
-  // Backend endpoint
-  const BACKEND_URL = "http://localhost:8000/details";
 
+  const fetchDetails=async()=>{
+    try{
+      const res=await fetch("http://127.0.0.1:8000/details/Signal_A")
+      const data = await res.json();
+      setcarAmount(data.car_amount);
+      setSignal(data.signal === "Green" ? "🟢" : "🔴");
+
+    }catch(err){
+      console.log("Something went wrong mate");
+    }
+   
+
+   
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(BACKEND_URL);
-        const data = await res.json();
-
-        // Find Signal A in the list
-        const signalA = data.find((item) => item.intersection_name === "Signal A");
-
-        if (signalA) {
-          setCarsCount(signalA.car_amount);
-          setSignalStatus(signalA.signal === "Green" ? "🟢" : "🔴");
-
-          // Append new datapoint to chart
-          setChartData((prev) => {
-            const newData = [
-              ...prev,
-              {
-                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-                cars: signalA.car_amount,
-              },
-            ];
-            return newData.slice(-10); // Keep last 10 points
-          });
-        }
-      } catch (err) {
-        console.error("Error fetching:", err);
-      }
-    };
-
-    fetchData();
-    const interval = setInterval(fetchData, 2000); // refresh every 2s
-    return () => clearInterval(interval);
+    fetchDetails();
   }, []);
+   const signal_red=async()=>{
+      try{
+        await fetch('http://127.0.0.1:8000/signal/Signal_A/red',{
+          method:'POST',
+        })
+        await fetchDetails();
+        const res=await fetch("http://127.0.0.1:8000/details/Signal_A")
+        const json = await res.json()
+        setSignal(json.signal)
+      }catch(err){
+        console.log("Something went wrong")
+      }
+      if(intervalRef.current){
+        clearInterval(intervalRef.current);
+        intervalRef.current=null;
+      }
+    }
+    const signal_green=async()=>{
+      try{
+        await fetch('http://127.0.0.1:8000/signal/Signal_A/green',{
+          method:'POST',
+        })
+        
+        const res=await fetch("http://127.0.0.1:8000/details/Signal_A")
+        const json = await res.json()
+        setSignal(json.signal)
+        await fetchDetails();
+      }catch(err){
+        console.log("Something went wrong")
+      }
+      if(!intervalRef.current){
+        intervalRef.current=setInterval(async()=>{
+         fetch("http://127.0.0.1:8000/intersection/Signal_A",{
+          method:'POST'
+         })
+         await fetchDetails();
+          const res=fetch("http://127.0.0.1:8000/details/Signal_A")
+          const json = (await res).json()
+          setcarAmount(json.car_amount)
 
+        },3000);
+      }
+    }
   const items = ["Amount of Cars", "Signal"];
 
   return (
@@ -58,7 +84,7 @@ export default function IntersectionA() {
       </div>
 
       <ResponsiveContainer width="100%" height={250}>
-        <AreaChart data={chartData}>
+        <AreaChart data={cars}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="time" stroke="#aaa" />
           <Tooltip />
@@ -74,31 +100,47 @@ export default function IntersectionA() {
       </ResponsiveContainer>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto mt-6">
-        {items.map((value, index) => (
+       
           <Card
-            key={index}
+            
             className="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
           >
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-gray-100">
-                {value}
+                {carAmount}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-4">
               <div
-                className={`w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold text-white ${
-                  value === "Amount of Cars"
-                    ? "bg-gray-700"
-                    : signalStatus === "🟢"
-                    ? "bg-green-500 shadow-lg shadow-green-500/50"
-                    : "bg-red-500 shadow-lg shadow-red-500/50"
-                }`}
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold text-white 
+                 
+                `}
               >
-                {value === "Amount of Cars" ? carsCount : signalStatus}
+                {signal}
               </div>
             </CardContent>
           </Card>
-        ))}
+          <Card
+            
+            className="bg-gray-800 border border-gray-700 rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300"
+          >
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-100">
+                Signals(Tap to Change)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center gap-4">
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold text-white 
+                 
+                `}
+              >
+               <Button onClick={signal_green}>Green</Button>
+               <Button onClick={signal_red}>Red</Button>
+              </div>
+            </CardContent>
+          </Card>
+       
       </div>
     </div>
   );

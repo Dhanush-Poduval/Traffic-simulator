@@ -23,7 +23,7 @@ neighbours={
 }
 
 
-intersections=['Signal A','Signal B','Signal C','Signal D']
+intersections=['Signal_A','Signal_B','Signal_C','Signal_D']
     
 
 def get_db():
@@ -60,6 +60,10 @@ def car_generator(db: Session = Depends(get_db)):
 def get_all(db:Session=Depends(get_db)):
     values=db.query(models.Intersection).all()
     return values
+@app.get('/details/{intersection_name}',response_model=schemas.Intersection)
+def get_specific(intersection_name,db:Session=Depends(get_db)):
+    new_values=db.query(models.Intersection).filter(models.Intersection.intersection_name==intersection_name).first()
+    return new_values
 @app.post('/signal/{intersection_name}/green')
 def green(intersection_name,db:Session=Depends(get_db)):
     signals=db.query(models.Intersection).filter(models.Intersection.intersection_name==intersection_name).first()
@@ -97,14 +101,14 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
     random_cars=round(random.uniform(1,cars))
 
     #to get the places where these cars can like go too
-    short_name=intersection_name.split()[-1]
+    short_name=intersection_name.split('_')[-1]
     neightbour_list=neighbours.get(short_name,[])
 
     cars_first=random.randint(0,random_cars)
     cars_second=random_cars-cars_first
 
     for neighbour_short , cars_toadd in zip(neightbour_list,[cars_first,cars_second]):
-        neighbour_full_name=f'Signal {neighbour_short}'
+        neighbour_full_name=f'Signal_{neighbour_short}'
         neighbor = db.query(models.Intersection).filter(models.Intersection.intersection_name == neighbour_full_name).first()
         if not neighbor:
             neighbor = models.Intersection(car_amount=0, signal='Red', intersection_name=neighbour_full_name)
@@ -117,7 +121,7 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
             
     
     
-    intersection.car_amount=1
+    intersection.car_amount-=random_cars
     
 
     
