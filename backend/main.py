@@ -3,9 +3,17 @@ from fastapi import FastAPI,Depends , HTTPException,status
 from .import models,schemas
 from .database import engine,SessionLocal
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 import random
 
 app=FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # change "*" to ["http://localhost:3000"] for security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 neighbours={
     'A':['B','D'],
