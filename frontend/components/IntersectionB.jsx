@@ -7,7 +7,7 @@ import { Button } from "./ui/button";
 
 const cars=[60,60,80,30];
 
-export default function IntersectionA() {
+export default function IntersectionB() {
   
   const [carAmount , setcarAmount]=useState()
   const[signal , setSignal]=useState()
@@ -17,7 +17,7 @@ export default function IntersectionA() {
 
   const fetchDetails=async()=>{
     try{
-      const res=await fetch("http://127.0.0.1:8000/details/Signal_A")
+      const res=await fetch("http://127.0.0.1:8000/details/Signal_B")
       const data = await res.json();
       setcarAmount(data.car_amount);
       setSignal(data.signal === "Green" ? "🟢" : "🔴");
@@ -44,11 +44,11 @@ export default function IntersectionA() {
   }, []);
    const signal_red=async()=>{
       try{
-        await fetch('http://127.0.0.1:8000/signal/Signal_A/red',{
+        await fetch('http://127.0.0.1:8000/signal/Signal_B/red',{
           method:'POST',
         })
         
-        const res=await fetch("http://127.0.0.1:8000/details/Signal_A")
+        const res=await fetch("http://127.0.0.1:8000/details/Signal_B")
         await fetchDetails();
         const json = await res.json()
         setSignal(json.signal)
@@ -65,11 +65,11 @@ export default function IntersectionA() {
     }
     const signal_green=async()=>{
       try{
-        await fetch('http://127.0.0.1:8000/signal/Signal_A/green',{
+        await fetch('http://127.0.0.1:8000/signal/Signal_B/green',{
           method:'POST',
         })
         
-        const res=await fetch("http://127.0.0.1:8000/details/Signal_A")
+        const res=await fetch("http://127.0.0.1:8000/details/Signal_B")
         const json = await res.json()
         setSignal(json.signal)
         await fetchDetails();
@@ -78,11 +78,11 @@ export default function IntersectionA() {
       }
       if(!intervalRef.current){
         intervalRef.current=setInterval(async()=>{
-         await fetch("http://127.0.0.1:8000/intersection/Signal_A",{
+         await fetch("http://127.0.0.1:8000/intersection/Signal_B",{
           method:'POST'
          })
          await fetchDetails();
-          const res= await fetch("http://127.0.0.1:8000/details/Signal_A")
+          const res= await fetch("http://127.0.0.1:8000/details/Signal_B")
           const json = await res.json()
           setcarAmount(json.car_amount)
 
