@@ -74,7 +74,7 @@ export default function IntersectionC() {
         setSignal(json.signal)
         await fetchDetails();
       }catch(err){
-        console.log("Something went wrong")
+        console.log("Something went wrong C")
       }
       if(!intervalRef.current){
         intervalRef.current=setInterval(async()=>{
@@ -95,7 +95,7 @@ export default function IntersectionC() {
     <div className="p-6 bg-gradient-to-br from-gray-900 to-black min-h-screen">
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-center tracking-tight text-white">
-          Intersection A
+          Intersection C
         </h2>
       </div>
 

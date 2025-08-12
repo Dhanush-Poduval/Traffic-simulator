@@ -30,7 +30,7 @@ export default function IntersectionA() {
       });
 
     }catch(err){
-      console.log("Something went wrong mate");
+      console.log("Something went wrong mate A");
     }
    
 

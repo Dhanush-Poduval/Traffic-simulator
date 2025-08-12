@@ -30,7 +30,7 @@ export default function IntersectionB() {
       });
 
     }catch(err){
-      console.log("Something went wrong mate");
+      console.log("Something went wrong mate B");
     }
    
 
@@ -95,7 +95,7 @@ export default function IntersectionB() {
     <div className="p-6 bg-gradient-to-br from-gray-900 to-black min-h-screen">
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-center tracking-tight text-white">
-          Intersection A
+          Intersection B
         </h2>
       </div>
 
