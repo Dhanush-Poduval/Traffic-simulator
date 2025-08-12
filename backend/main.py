@@ -98,7 +98,12 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
 
     cars=intersection.car_amount
     #randomize car count from cars
-    random_cars=round(random.uniform(1,cars))
+    if cars>0:
+        random_cars=min(random.randint(1,3),cars)
+    else:
+        random_cars=0
+
+    
 
     #to get the places where these cars can like go too
     short_name=intersection_name.split('_')[-1]
@@ -122,6 +127,7 @@ def count_logic(intersection_name,db:Session=Depends(get_db)):
     
     
     intersection.car_amount-=random_cars
+    intersection.car_amount = max(intersection.car_amount, 0)
     
 
     

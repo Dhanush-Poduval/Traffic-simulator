@@ -62,12 +62,12 @@ export default function IntersectionA() {
       }
       if(!intervalRef.current){
         intervalRef.current=setInterval(async()=>{
-         fetch("http://127.0.0.1:8000/intersection/Signal_A",{
+         await fetch("http://127.0.0.1:8000/intersection/Signal_A",{
           method:'POST'
          })
          await fetchDetails();
-          const res=fetch("http://127.0.0.1:8000/details/Signal_A")
-          const json = (await res).json()
+          const res= await fetch("http://127.0.0.1:8000/details/Signal_A")
+          const json = await res.json()
           setcarAmount(json.car_amount)
 
         },3000);
