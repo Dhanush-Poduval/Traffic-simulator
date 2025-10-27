@@ -132,6 +132,7 @@ export default function IntersectionA() {
                  
                 `}
               >
+              Car amount
                 {signal}
               </div>
             </CardContent>
