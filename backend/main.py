@@ -5,7 +5,7 @@ from .database import engine,SessionLocal
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 import random
-
+#initialization of app routes and database
 app=FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -15,6 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#neighbouring intersections of a particular road
 neighbours={
     'A':['B','D'],
     'B':['A','C'],
@@ -22,9 +23,11 @@ neighbours={
     'D':['C','A']
 }
 
-
+#given intersections
 intersections=['Signal_A','Signal_B','Signal_C','Signal_D']
-    
+
+
+#creation of database section
 
 def get_db():
     db=SessionLocal()
@@ -35,7 +38,7 @@ def get_db():
 
 models.Base.metadata.create_all(bind=engine)
 
-
+#intersection of cars generator
 @app.post('/intersection', status_code=200, response_model=schemas.Intersection)
 def car_generator(db: Session = Depends(get_db)):
     intersection_name = random.choice(intersections)
